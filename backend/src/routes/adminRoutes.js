@@ -3,24 +3,17 @@ import { authenticate, authorize } from '../middleware/auth.js';
 import {
   createInternalAccount,
   createClientCredentials,
-  getAdminDashboard,
+  getDashboard,
   getAllUsers,
-  getAllProjects,
-  getAllContacts,
-  getSystemStats
+  getAllProjects
 } from '../controllers/adminController.js';
 
 const router = express.Router();
 
-// Tutti gli endpoint admin richiedono autenticazione e ruolo admin
-router.use(authenticate, authorize('admin'));
-
-router.post('/account/internal', createInternalAccount);
-router.post('/account/client-credentials', createClientCredentials);
-router.get('/dashboard', getAdminDashboard);
-router.get('/users', getAllUsers);
-router.get('/projects', getAllProjects);
-router.get('/contacts', getAllContacts);
-router.get('/stats', getSystemStats);
+router.post('/account/internal', authenticate, authorize('admin'), createInternalAccount);
+router.post('/account/client-credentials', authenticate, authorize('admin'), createClientCredentials);
+router.get('/dashboard', authenticate, authorize('admin'), getDashboard);
+router.get('/users', authenticate, authorize('admin'), getAllUsers);
+router.get('/projects', authenticate, authorize('admin'), getAllProjects);
 
 export default router;

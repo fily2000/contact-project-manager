@@ -1,21 +1,17 @@
 import express from 'express';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, authorize } from '../middleware/auth.js';
 import {
-  getSubscription,
-  createSubscription,
-  updateSubscription,
-  cancelSubscription,
-  getPlans,
-  handleWebhook
+  getCurrentSubscription,
+  getAvailablePlans,
+  upgradeSubscription,
+  cancelSubscription
 } from '../controllers/subscriptionController.js';
 
 const router = express.Router();
 
-router.get('/plans', getPlans);
-router.get('/', authenticate, getSubscription);
-router.post('/', authenticate, createSubscription);
-router.put('/', authenticate, updateSubscription);
-router.delete('/', authenticate, cancelSubscription);
-router.post('/webhook', handleWebhook);
+router.get('/plans', getAvailablePlans);
+router.get('/current', authenticate, getCurrentSubscription);
+router.post('/upgrade', authenticate, upgradeSubscription);
+router.post('/cancel', authenticate, cancelSubscription);
 
 export default router;
