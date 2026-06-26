@@ -1,0 +1,56 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: contact-pm-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - contact-pm-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: contact-pm-backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/contact-project-manager
+      PORT: 5000
+      JWT_SECRET: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      GOOGLE_DRIVE_API_KEY: ${GOOGLE_DRIVE_API_KEY}
+    depends_on:
+      - mongodb
+    networks:
+      - contact-pm-network
+    command: npm start
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: contact-pm-frontend
+    ports:
+      - "80:80"
+    environment:
+      VITE_API_URL: http://backend:5000
+    depends_on:
+      - backend
+    networks:
+      - contact-pm-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  contact-pm-network:
+    driver: bridge
